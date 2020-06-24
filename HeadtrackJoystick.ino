@@ -11,18 +11,15 @@
 NXPMotionSense imu;
 Mahony filter;
 
+int joyheading;
+int joypitch;
+int joyroll;
+
 void setup() {
   Serial.begin(9600);
   imu.begin();
   filter.begin(100); // 100 measurements per second
 }
-
-float minRoll=1;
-float minPitch=1;
-float minHeading=1;
-float maxRoll=1;
-float maxPitch=1;
-float maxHeading=1;
 
 void loop() {
   float ax, ay, az;
@@ -38,43 +35,30 @@ void loop() {
     filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
 
     // print the heading, pitch and roll
-    roll = filter.getRoll();   // -180..180
-    pitch = filter.getPitch(); //  -90..90
     heading = filter.getYaw(); //  0..360
+    pitch = filter.getPitch(); //  -90..90
+    roll = filter.getRoll();   // -180..180
+ 
+    Serial.print("Orientation: ");
+    Serial.print(heading);
+    Serial.print(" ");
+    Serial.print(pitch);
+    Serial.print(" ");
+    Serial.println(roll);
 
-    if (roll < minRoll){
-      minRoll = roll;
-    }
-    if (roll > maxRoll){
-      maxRoll = roll;
-    }
-    if (pitch < minPitch){
-      minPitch = pitch;
-    }
-    if (pitch > maxPitch){
-      maxPitch = pitch;
-    }
-    if (heading < minHeading){
-      minHeading = heading;
-    }
-    if (heading > maxHeading){
-      maxHeading = heading;
-    }
-    Serial.print("Heading: ");
-    Serial.print(minHeading);
-    Serial.print("-");
-    Serial.print(maxHeading);
+    joyheading = (heading / 360) * 1023;
+    joypitch = ((pitch + 90) / 180) * 1023;
+    joyroll = ((roll + 180) / 360) * 1023;
+
+    Joystick.Zrotate(joyheading);
+    Joystick.Y(joypitch);
+    Joystick.X(joyroll);
+
+    Serial.print("Joyvalue: ");
+    Serial.print(joyheading);
     Serial.print(" ");
-    Serial.print("Pitch: ");
-    Serial.print(minPitch);
-    Serial.print("-");
-    Serial.print(maxPitch);
+    Serial.print(joypitch);
     Serial.print(" ");
-    Serial.print("Roll: ");
-    Serial.print(minRoll);
-    Serial.print("-");
-    Serial.print(maxRoll);
-    
-    Serial.println();
+    Serial.println(joyroll);
   }
 }
