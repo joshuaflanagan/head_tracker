@@ -14,11 +14,18 @@ Mahony filter;
 int joyheading;
 int joypitch;
 int joyroll;
+float headingcenter = 180;
+float headingoffset;
+float adjustedheading;
 
 void setup() {
   Serial.begin(9600);
   imu.begin();
   filter.begin(100); // 100 measurements per second
+
+  //TODO: make this settable by pressing a button
+  headingcenter=328;
+  headingoffset = headingcenter - 180;
 }
 
 void loop() {
@@ -46,7 +53,14 @@ void loop() {
     Serial.print(" ");
     Serial.println(roll);
 
-    joyheading = (heading / 360) * 1023;
+    adjustedheading = heading - headingoffset;
+    if (adjustedheading < 0){
+      adjustedheading = adjustedheading + 360;
+    }
+    if (adjustedheading > 360){
+      adjustedheading = adjustedheading - 360;
+    }
+    joyheading = (adjustedheading / 360) * 1023;
     joypitch = ((pitch + 90) / 180) * 1023;
     joyroll = ((roll + 180) / 360) * 1023;
 
