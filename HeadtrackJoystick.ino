@@ -50,9 +50,9 @@ void loop() {
     joypitch = ((pitch + 90) / 180) * 1023;
     joyroll = ((roll + 180) / 360) * 1023;
 
-    Joystick.Zrotate(joyheading);
+    Joystick.X(joyheading);
     Joystick.Y(joypitch);
-    Joystick.X(joyroll);
+    Joystick.Z(joyroll);
 
     Serial.print("Joyvalue: ");
     Serial.print(joyheading);
